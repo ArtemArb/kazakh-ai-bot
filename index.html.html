@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QazaqTil Bot — Қазақша бірге үйренейік</title>
+<style>
+  :root {
+    --ink: #173d39;
+    --green: #126b56;
+    --pale: #eff6f1;
+    --line: #dce7df;
+    --bg: #f8faf6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  button, input, select { font: inherit; }
+  button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 17px;
+    background: var(--green);
+    color: white;
+    font-weight: 700;
+    transition: filter 0.2s;
+  }
+  button:hover { filter: brightness(.94); }
+  button:disabled { opacity: .45; cursor: default; }
+  .ghost { background: white; color: var(--ink); border: 1px solid var(--line); }
+  
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+    align-items: start;
+  }
+  
+  aside {
+    background: #fff;
+    border-right: 1px solid var(--line);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .brand {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 0 0 7px;
+    display: flex;
+    align-items: center;
+  }
+  .logo {
+    display: inline-grid;
+    place-items: center;
+    background: var(--green);
+    color: #fff;
+    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    margin-right: 8px;
+  }
+  .sub { color: #789088; font-size: 12px; }
+  .nav {
+    background: transparent;
+    color: #667d73;
+    text-align: left;
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+  .nav.active { background: #eaf3ed; color: var(--green); font-weight: 700; }
+  .asidefoot {
+    margin-top: auto;
+    padding-top: 25px;
+    font-size: 12px;
+    color: #789088;
+    line-height: 1.6;
+  }
+
+  main {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 30px 40px;
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tag {
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    background: white;
+  }
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    background: #e9f2e7;
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 25px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 800;
+    color: #43816b;
+  }
+  h1 { font-size: 32px; line-height: 1.2; letter-spacing: -1px; margin: 10px 0; }
+  p { line-height: 1.65; }
+  .hero p { color: #5c7868; max-width: 560px; margin: 0; }
+  .motif { font-size: 55px; color: #73a88b; line-height: 1; transform: rotate(-15deg); text-align: center; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+  }
+  
+  .grid.full-width {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .panelhead {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  h2 { font-size: 17px; margin: 0; }
+
+  #chat {
+    height: 360px;
+    overflow-y: auto;
+    padding: 24px;
+    scroll-behavior: smooth;
+  }
+  .bubble {
+    max-width: 85%;
+    padding: 14px 17px;
+    border-radius: 16px;
+    background: var(--pale);
+    margin: 0 0 15px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .bubble.me {
+    background: var(--green);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+  .who {
+    font-size: 10px;
+    color: #698277;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .bubble.me .who { color: #b7e4d2; }
+
+  /* Стиль для маленьких встроенных кнопочек внутри сообщений чата */
+  .chat-inline-btn {
+    display: inline-block;
+    margin-top: 8px;
+    margin-left: 4px;
+    padding: 6px 12px;
+    background: var(--green);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
+  .chat-inline-btn:hover {
+    filter: brightness(.9);
+  }
+
+  .options-container {
+    padding: 0 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    text-align: left;
+    background: #f2f6f2;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .option-btn:hover {
+    background: #e5f1e9;
+    border-color: #a7cbb5;
+  }
+  .option-btn.correct {
+    background: #d4edda !important;
+    color: #155724 !important;
+    border-color: #c3e6cb !important;
+  }
+  .option-btn.wrong {
+    background: #f8d7da !important;
+    color: #721c24 !important;
+    border-color: #f5c6cb !important;
+  }
+
+  .keyboard {
+    display: flex;
+    gap: 5px;
+    padding: 0 24px 12px;
+    flex-wrap: wrap;
+  }
+  .keyboard button {
+    padding: 6px 11px;
+    background: #f2f6f2;
+    color: #466359;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+  .entry {
+    display: flex;
+    gap: 8px;
+    padding: 14px 24px;
+    border-top: 1px solid var(--line);
+  }
+  input {
+    min-width: 0;
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    background: #fcfdfb;
+    color: var(--ink);
+  }
+  input:focus { outline: 2px solid #8ec8ae; }
+  .actions {
+    padding: 0 24px 18px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .actions button { font-size: 12px; padding: 9px 12px; }
+
+  .side { padding: 24px; }
+  .side h2 { margin-bottom: 18px; }
+  .topic {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    background: #f7f9f6;
+    color: var(--ink);
+    text-align: left;
+    border-radius: 12px;
+  }
+  .topic.chosen { background: #e5f1e9; outline: 1px solid #a7cbb5; font-weight: 700; }
+  .topic span { font-size: 20px; }
+  .note { font-size: 12px; color: #74887b; line-height: 1.7; margin-top: 18px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+  }
+  .stat {
+    padding: 18px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .number { font-size: 26px; font-weight: 800; }
+  .label { font-size: 12px; color: #71877c; margin-top: 4px; }
+
+  .hide { display: none !important; }
+  .word { font-size: 40px; text-align: center; padding: 20px 0 10px; letter-spacing: -1px; font-weight: 800; color: var(--green); }
+  .center { text-align: center; }
+  .pill { display: inline-block; padding: 5px 10px; background: var(--pale); border-radius: 20px; font-size: 11px; font-weight: 600; }
+  #vocab, #progress { padding: 28px; }
+  
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line); }
+  .wrap { overflow-x: auto; }
+  .muted { color: #708779; font-size: 13px; }
+  
+  footer { font-size: 11px; color: #829286; margin-top: 30px; text-align: center; }
+  
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(22, 57, 46, 0.5);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal > div {
+    background: white;
+    max-width: 580px;
+    width: 100%;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  @media(max-width: 900px) {
+    .app { display: block; }
+    aside {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+      padding: 20px;
+      gap: 6px;
+    }
+    .asidefoot, aside > .sub { display: none; }
+    .nav { padding: 10px 12px; font-size: 13px; }
+    main { padding: 20px; }
+    .grid { grid-template-columns: 1fr !important; }
+  }
+
+  @media(max-width: 600px) {
+    h1 { font-size: 24px; }
+    .stats { grid-template-columns: 1fr; gap: 10px; }
+    .panelhead { padding: 15px; }
+    #chat { height: 300px; padding: 16px; }
+    .entry, .keyboard, .actions { padding-left: 16px; padding-right: 16px; }
+    .bubble { max-width: 95%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="logo">Q</span>QazaqTil<span style="color:#7ca48d">.</span></div>
+    <div class="sub">Қазақша бірге үйренейік</div>
+    <br>
+    <button class="nav active" data-view="learn">◉ &nbsp; Практика диалога</button>
+    <button class="nav" data-view="vocab">▤ &nbsp; Мой словарь</button>
+    <button class="nav" data-view="test">✓ &nbsp; Проверка знаний</button>
+    <button class="nav" data-view="progress">↗ &nbsp; Мой прогресс</button>
+    <div class="asidefoot">
+      Школьный проект · 9 класс<br>
+      Арбузов Артем<br>
+      С. И. Морозов атындағы №51 гимназия<br>
+      <button class="ghost" id="about" style="margin-top:10px; font-size:11px; width:100%;">О проекте</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <span class="eyebrow">Твой маленький шаг каждый день</span>
+      <span class="tag" id="modetag">● Режим · Практика диалога</span>
+    </div>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Сәлем, досым!</div>
+        <h1 id="title">Давай говорить по-казахски</h1>
+        <p id="subtitle">Учись строить правильные фразы, а я помогу подсказкой и объяснением правила.</p>
+      </div>
+      <div class="motif">✳<br>✳</div>
+    </section>
+
+    <div class="grid" id="main-grid">
+      <section class="panel">
+        <div class="panelhead">
+          <h2 id="paneltitle">Твой собеседник</h2>
+          <span class="pill" id="stage">Практика · Знакомство</span>
+        </div>
+
+        <div id="learn">
+          <div id="chat" aria-live="polite"></div>
+          
+          <div id="options-box" class="options-container hide"></div>
+
+          <div class="keyboard" id="keyboard"></div>
+          <form class="entry" id="form">
+            <input id="answer" aria-label="Ответ на казахском" placeholder="Жауабыңды жаз…" autocomplete="off">
+            <button type="submit" id="send-btn">Отправить ↗</button>
+          </form>
+          <div class="actions">
+            <button class="ghost" id="hint">Подсказка 1 / 2</button>
+            <button class="ghost" id="explain">Показать объяснение</button>
+            <button class="ghost hide" id="next">Следующее задание →</button>
+          </div>
+        </div>
+
+        <div id="vocab" class="hide">
+          <span class="pill" id="wordcount"></span>
+          <div class="word" id="word"></div>
+          <p class="center muted" id="worddir"></p>
+          <form class="entry" id="wordform">
+            <input id="wordanswer" aria-label="Перевод слова" placeholder="Твой перевод" autocomplete="off">
+            <button type="submit">Проверить</button>
+          </form>
+          <div class="keyboard" id="wordkeyboard" style="padding: 10px 0 0 0;"></div>
+          <p id="wordfeedback" aria-live="polite" style="margin: 15px 0; font-weight: 600;"></p>
+          <button class="ghost" id="wordnext" style="margin-bottom: 15px;">Другое слово →</button>
+          <p class="note">Перевод в обе стороны. Слова с ошибками чаще возвращаются в очередь повторения.</p>
+        </div>
+
+        <div id="progress" class="hide">
+          <h2>История самостоятельных попыток</h2>
+          <p class="muted">Данные сохраняются только в этом браузере.</p>
+          <div class="wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Задание</th>
+                  <th>Первый ответ</th>
+                  <th>Помощь</th>
+                  <th>Итог</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <p style="margin-top: 20px;">
+            <button id="export">Скачать JSON</button> 
+            <button class="ghost" id="clear">Удалить историю</button>
+          </p>
+          <p id="testresult" class="note"></p>
+        </div>
+      </section>
+
+      <section class="panel side" id="sidebar-topics">
+        <h2>О чём поговорим?</h2>
+        <div id="topics"></div>
+        <p class="note">15 минут практики<br>5 жизненных тем<br>Казахские буквы под рукой</p>
+        <hr style="border:0; border-top:1px solid var(--line); width:100%; margin: 15px 0;">
+        <p class="note">Учебный прототип проверяет полноту ответа и правильность конструкций.</p>
+      </section>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="number" id="s1">0</div>
+        <div class="label">самостоятельно верно</div>
+      </div>
+      <div class="stat">
+        <div class="number" id="s2">0</div>
+        <div class="label">сохранённых заданий</div>
+      </div>
+      <div class="stat">
+        <div class="number" id="s3">0</div>
+        <div class="label">слов в практике</div>
+      </div>
+    </div>
+
+    <footer>QazaqTil Bot · Учимся через собственную попытку · Школьный проект Артема Арбузова</footer>
+  </main>
+</div>
+
+<div class="modal hide" id="modal">
+  <div>
+    <h2>О QazaqTil Bot</h2>
+    <p>Учебный прототип к научному проекту Артема Арбузова (9 класс, Гимназия №51 им. С.И. Морозова). Диалоги, подсказки, словарь и проверка работают прямо в браузере.</p>
+    <p class="muted">История сохраняется локально на вашем устройстве.</p>
+    <br>
+    <button id="close" style="width: 100%;">Понятно</button>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const topics = ['Знакомство', 'Школа', 'Семья', 'Магазин', 'Свободное время'];
+const icons = ['👋', '📚', '🏠', '🛍', '🎵'];
+
+const bank = [
+  [
+    ['Представься, написав своё имя (например: Менің атым Артем).', ['менің атым артем', 'мен артеммін', 'менің атым әділ', 'менің атым тимур', 'менің атым диас'], 'Вспомни полную конструкцию «меня зовут [имя]».', 'Начни с «Менің атым …» и укажи имя.', 'Менің атым [Имя] — Меня зовут [Имя]. Важно указывать имя полностью.'],
+    ['Скажи, что учишься в девятом классе.', ['мен тоғызыншы сыныпта оқимын', 'мен тоғызыншы сыныптамын', 'тоғызыншы сыныпта оқимын'], 'Нужно сказать предложение целиком: «Я учусь в девятом классе».', 'Используй «Мен тоғызыншы сыныпта оқимын».', 'Сыныпта — в классе; оқимын — я учусь.'],
+    ['Поздоровайся вежливо со взрослым.', ['сәлеметсіз бе', 'сәлеметсіз бе!'], 'Обращение к взрослому требует вежливой формы.', 'Начни со слова «Сәлеметсіз бе!».', 'Сәлеметсіз бе! — Здравствуйте!']
+  ],
+  [
+    ['Скажи: «Я иду в школу».', ['мен мектепке барамын', 'мектепке барамын'], 'Здесь нужно направление — куда? (окончание -ке).', 'Используй форму «Мен мектепке барамын».', 'Мектепке — в школу. Мен мектепке барамын.'],
+    ['Напиши предложение: «Я читаю книгу».', ['мен кітап оқимын', 'кітап оқимын'], 'Действие (глагол) ставится в самом конце предложения.', 'Начни с «Мен кітап оқимын».', 'Мен кітап оқимын — Я читаю книгу.'],
+    ['Скажи: «Мой любимый предмет — информатика».', ['менің сүйікті пәнім информатика', 'сүйікті пәнім информатика'], 'Пән — учебный предмет.', 'Используй структуру «Менің сүйікті пәнім — информатика».', 'Менің сүйікті пәнім — информатика.']
+  ],
+  [
+    ['Напиши предложение: «Это моя семья».', ['бұл менің отбасым', 'бұл — менің отбасым'], 'Отбасы означает «семья», а бұл — «это».', 'Используй конструкцию «Бұл — менің отбасым».', 'Бұл — менің отбасым.'],
+    ['Скажи: «У меня есть старший брат».', ['менің ағам бар'], 'Аға — старший брат.', 'Используй конструкцию «Менің … бар».', 'Менің ағам бар.'],
+    ['Скажи: «У меня есть младший брат».', ['менің інім бар'], 'Іні — младший брат.', 'Вспомни конструкцию «Менің інім бар».', 'Менің інім бар — У меня есть младший брат.']
+  ],
+  [
+    ['Спроси цену тетради: «Сколько стоит тетрадь?».', ['дәптер қанша тұрады', 'дәптердің бағасы қанша'], 'Вопрос о цене начинается с названия предмета.', 'Используй «Дәптер қанша тұрады?».', 'Дәптер қанша тұрады? — Сколько стоит тетрадь?'],
+    ['Попроси воду вежливо: «Дайте мне воду, пожалуйста».', ['маған су беріңізші', 'су беріңізші'], 'Су — вода. Нужна вежливая просьба с суффиксом -ші.', 'Начни с «Маған … беріңізші».', 'Маған су беріңізші — Дайте мне воду, пожалуйста.'],
+    ['Спроси цену книги.', ['кітап қанша тұрады', 'кітаптың бағасы қанша'], 'Кітап — книга.', 'Вспомни форму вопроса о цене.', 'Кітап қанша тұрады?']
+  ],
+  [
+    ['Скажи: «Я слушаю музыку».', ['мен музыка тыңдаймын', 'музыка тыңдаймын'], 'Тыңдау — слушать.', 'Используй «Мен музыка тыңдаймын».', 'Мен музыка тыңдаймын.'],
+    ['Скажи: «Я люблю спорт».', ['мен спортты ұнатамын', 'спортты ұнатамын'], 'Ұнату — любить, предпочитать.', 'Используй «Мен спортты ұнатамын».', 'Мен спортты ұнатамын.'],
+    ['Скажи: «Я играю в футбол».', ['мен футбол ойнаймын', 'футбол ойнаймын'], 'Ойнау — играть.', 'Используй «Мен футбол ойнаймын».', 'Мен футбол ойнаймын.']
+  ]
+];
+
+const customTestOptions = {
+  'Представься, написав своё имя (например: Менің атым Артем).': [
+    'Менің атым Артем', 'Мен мектепке барамын', 'Менің атым отбасым', 'Мен кітап оқимын'
+  ],
+  'Скажи, что учишься в девятом классе.': [
+    'Мен тоғызыншы сыныпта оқимын', 'Мен тоғызыншы сыныппын', 'Мен мектепте оқимын', 'Мен тоғызыншы келемін'
+  ],
+  'Поздоровайся вежливо со взрослым.': [
+    'Сәлеметсіз бе', 'Сәлем досым', 'Қалай жағдайың', 'Сау болңыз'
+  ],
+  'Скажи: «Я иду в школу».': [
+    'Мен мектепке барамын', 'Мен мектепте оқимын', 'Мен дүкенге барамын', 'Мектеп өте жақсы'
+  ],
+  'Напиши предложение: «Я читаю книгу».': [
+    'Мен кітап оқимын', 'Мен кітап жазамын', 'Мен музыка тыңдаймын', 'Кітап қанша тұрады'
+  ],
+  'Скажи: «Мой любимый предмет — информатика».': [
+    'Менің сүйікті пәнім информатика', 'Мен информатика ойнаймын', 'Менің мектебім үлкен', 'Информатика өте қызық'
+  ],
+  'Напиши предложение: «Это моя семья».': [
+    'Бұл — менің отбасым', 'Менің ағам бар', 'Бұл менің досым', 'Отбасы үлкен болады'
+  ],
+  'Скажи: «У меня есть старший брат».': [
+    'Менің ағам бар', 'Менің інім бар', 'Менің атым Аға', 'Ағам мектепке барады'
+  ],
+  'Скажи: «У меня есть младший брат».': [
+    'Менің інім бар', 'Менің ағам бар', 'Мен інімді жақсы көремін', 'Інім кішкентай'
+  ],
+  'Спроси цену тетради: «Сколько стоит тетрадь?».': [
+    'Дәптер қанша тұрады', 'Кітап қанша тұрады', 'Дәптердің бағасы жоқ', 'Маған дәптер беріңіз'
+  ],
+  'Попроси воду вежливо: «Дайте мне воду, пожалуйста».': [
+    'Маған су беріңізші', 'Су қанша тұрады', 'Маған сүт беріңіз', 'Су ішкім келеді'
+  ],
+  'Спроси цену книги.': [
+    'Кітап қанша тұрады', 'Кітап оқығым келеді', 'Кітаптың бағасы қанша', 'Бұл кітап па'
+  ],
+  'Скажи: «Я слушаю музыку».': [
+    'Мен музыка тыңдаймын', 'Мен спортты ұнатамын', 'Музыка өте жақсы', 'Мен ән айтамын'
+  ],
+  'Скажи: «Я люблю спорт».': [
+    'Мен спортты ұнатамын', 'Мен футбол ойнаймын', 'Спорт денсаулық кепілі', 'Мен спортқа барамын'
+  ],
+  'Скажи: «Я играю в футбол».': [
+    'Мен футбол ойнаймын', 'Мен спортты ұнатамын', 'Футбол өте қызық', 'Мен футболға барамын'
+  ]
+};
+
+const words = [
+  ['кітап', 'книга'], ['дәптер', 'тетрадь'], ['қалам', 'ручка'], ['мектеп', 'школа'], 
+  ['мұғалім', 'учитель'], ['оқушы', 'ученик'], ['дос', 'друг'], ['отбасы', 'семья'], 
+  ['ана', 'мама|мать'], ['әке', 'папа|отец'], ['аға', 'старший брат'], ['іні', 'младший брат'], 
+  ['дүкен', 'магазин'], ['нан', 'хлеб'], ['сүт', 'молоко'], ['су', 'вода'], 
+  ['алма', 'яблоко'], ['баға', 'цена'], ['сабақ', 'урок'], ['бос уақыт', 'свободное время']
+];
+
+let data = { logs: [], seen: [], miss: [], tests: [] };
+try { Object.assign(data, JSON.parse(localStorage.getItem('qtbot-v1') || '{}')); } catch {}
+
+let topic = 0, idx = 0, hints = 0, attempts = 0, first = '', done = false, view = 'learn', test = false, questions = [], testindex = 0, score = 0, currentWord = 0, reverse = false, worddone = false;
+
+function save() {
+  try { localStorage.setItem('qtbot-v1', JSON.stringify(data)); } catch {}
+  stats();
+}
+
+function norm(s) {
+  return s.normalize('NFC').toLocaleLowerCase().replace(/[.,!?—–:;«»"-]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function say(text, me = false, inlineButton = null) {
+  const b = document.createElement('div');
+  b.className = 'bubble' + (me ? ' me' : '');
+  const who = document.createElement('div');
+  who.className = 'who';
+  who.textContent = me ? 'Сен · Ты' : 'QazaqTil · Помощник';
+  b.append(who, document.createTextNode(text));
+  
+  // Если передана мини-кнопка для вставки в сообщение
+  if (inlineButton) {
+    b.append(document.createElement('br'));
+    b.append(inlineButton);
+  }
+
+  $('#chat').append(b);
+  $('#chat').scrollTop = $('#chat').scrollHeight;
+}
+
+function item() { return test ? questions[testindex] : bank[topic][idx]; }
+
+function setView(v) {
+  view = v;
+  document.querySelectorAll('.nav').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  
+  ['learn', 'vocab', 'progress'].forEach(k => $('#' + k).classList.toggle('hide', k !== (v === 'test' ? 'learn' : v)));
+  
+  const isLearnOnly = (v === 'learn');
+  $('#sidebar-topics').classList.toggle('hide', !isLearnOnly);
+  $('#main-grid').classList.toggle('full-width', !isLearnOnly);
+
+  const titles = { learn: 'Давай говорить по-казахски', vocab: 'Новое слово — новый шаг', test: 'Проверка знаний', progress: 'Твой путь к уверенной речи' };
+  const tags = { learn: '● Режим · Практика диалога', vocab: '● Режим · Словарь', test: '● Режим · Проверка знаний', progress: '● Режим · Прогресс' };
+  
+  $('#title').textContent = titles[v];
+  $('#modetag').textContent = tags[v];
+  $('#paneltitle').textContent = v === 'vocab' ? 'Словарь · 20 слов' : v === 'progress' ? 'Мой прогресс' : 'Твой собеседник';
+
+  if (v === 'vocab') newWord();
+  if (v === 'progress') renderProgress();
+  if (v === 'test') startTest();
+  if (v === 'learn') { test = false; start(); }
+}
+
+function start() {
+  hints = 0; attempts = 0; first = ''; done = false;
+  $('#chat').replaceChildren();
+  $('#answer').value = '';
+  $('#answer').disabled = false;
+  $('#send-btn').disabled = false;
+  $('#next').classList.add('hide');
+  $('#hint').disabled = false;
+  $('#hint').textContent = 'Подсказка 1 / 2';
+  $('#hint').classList.toggle('hide', test);
+  $('#explain').classList.toggle('hide', test);
+  $('#explain').disabled = false;
+  
+  if (test) {
+    $('#stage').textContent = `Проверка · ${testindex + 1} / ${questions.length}`;
+    $('#form').classList.add('hide');
+    $('#keyboard').classList.add('hide');
+    $('#options-box').classList.remove('hide');
+    
+    say('Выберите правильный вариант ответа:\n\n' + item()[0]);
+    renderOptions();
+  } else {
+    $('#stage').textContent = `Практика · ${topics[topic]}`;
+    $('#form').classList.remove('hide');
+    $('#keyboard').classList.remove('hide');
+    $('#options-box').classList.add('hide');
+    say('Сәлем! ' + item()[0]);
+  }
+}
+
+function renderOptions() {
+  const box = $('#options-box');
+  box.replaceChildren();
+  
+  const questionText = item()[0];
+  let options = customTestOptions[questionText] ? [...customTestOptions[questionText]] : [item()[1][0], 'Вариант бұрыс', 'Қате жауап', 'Басқа нұсқа'];
+  options = options.sort(() => Math.random() - .5);
+  
+  const correctOption = item()[1][0];
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => handleTestChoice(opt, correctOption, btn);
+    box.append(btn);
+  });
+}
+
+function handleTestChoice(chosen, correct, btnElement) {
+  if (done) return;
+  done = true;
+  
+  const ok = (norm(chosen) === norm(correct));
+  if (ok) {
+    score++;
+    btnElement.classList.add('correct');
+    say(`Вы выбрали: "${chosen}"\nДұрыс! Ответ верный.`, true);
+  } else {
+    btnElement.classList.add('wrong');
+    document.querySelectorAll('.option-btn').forEach(b => {
+      if (norm(b.textContent) === norm(correct)) b.classList.add('correct');
+    });
+    say(`Вы выбрали: "${chosen}"\nНеверно. Правильный ответ: ${correct}`, true);
+  }
+  
+  data.tests.push({ date: new Date().toISOString(), task: item()[0], correct: ok });
+  save();
+  
+  $('#options-box').classList.add('hide');
+  $('#next').classList.remove('hide');
+  $('#next').textContent = 'Следующий вопрос →';
+}
+
+function record(ok, shown = false) {
+  data.logs.push({ date: new Date().toISOString(), mode: test ? 'контроль' : 'практика', task: item()[0], first, final: $('#answer').value, hints, attempts, correct: ok, independent: ok && attempts === 1 && !hints && !shown, explanation: shown });
+  save();
+}
+
+function checkExactOrAllowed(userInput, acceptedList) {
+  const cleanInput = norm(userInput);
+  if (acceptedList.some(x => x.includes('артем'))) {
+    if ((cleanInput.startsWith('менің атым') && cleanInput.length > 11) || (cleanInput.startsWith('мен') && cleanInput.length > 5)) {
+      return true;
+    }
+  }
+  return acceptedList.some(acc => cleanInput === norm(acc));
+}
+
+$('#form').onsubmit = e => {
+  e.preventDefault();
+  const value = $('#answer').value.trim();
+  if (!value || done) return;
+  attempts++;
+  if (attempts === 1) first = value;
+  say(value, true);
+
+  const ok = checkExactOrAllowed(value, item()[1]);
+
+  if (ok) {
+    record(true);
+    say('Дұрыс! ' + item()[4]);
+    done = true;
+    $('#answer').disabled = true;
+    $('#send-btn').disabled = true;
+    $('#hint').disabled = true;
+    $('#explain').disabled = true;
+    
+    suggestRandomTopicWithButton();
+    
+    $('#next').classList.remove('hide');
+    $('#next').textContent = 'Следующее задание →';
+  } else if (attempts >= 3) {
+    say('Пока не совпало с образцом.\nПравильный вариант: ' + item()[1][0] + '\n' + item()[4]);
+    done = true;
+    $('#answer').disabled = true;
+    $('#send-btn').disabled = true;
+    $('#hint').disabled = true;
+    $('#explain').disabled = true;
+    
+    suggestRandomTopicWithButton();
+    
+    record(false, true);
+    $('#next').classList.remove('hide');
+    $('#next').textContent = 'Следующее задание →';
+  } else {
+    say('Ответ не совсем точный. Проверь окончания, слова или воспользуйся подсказкой.');
+    $('#answer').select();
+  }
+};
+
+// Функция создания совета с встроенной маленькой кнопкой для перехода к рандомной теме
+function suggestRandomTopicWithButton() {
+  const availableIndices = topics.map((_, i) => i).filter(i => i !== topic);
+  const randomTopicIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  const randomTopicName = topics[randomTopicIndex];
+  
+  // Создаем маленькую кнопку прямо в чате
+  const btn = document.createElement('button');
+  btn.className = 'chat-inline-btn';
+  btn.textContent = `Перейти к разделу «${randomTopicName}»`;
+  btn.onclick = () => {
+    topic = randomTopicIndex;
+    idx = 0;
+    document.querySelectorAll('.topic').forEach((x, j) => x.classList.toggle('chosen', j === topic));
+    start();
+  };
+
+  say(`💡 Совет: Можешь также попробовать свои силы в разделе «${randomTopicName}» — выбери его в меню справа или нажми на кнопку ниже.`, false, btn);
+}
+
+$('#hint').onclick = () => {
+  if (!attempts) { say('Сначала напиши свой вариант ответа.'); return; }
+  if (hints < 2) {
+    say('Подсказка ' + (hints + 1) + ': ' + item()[2 + hints]);
+    hints++;
+    $('#hint').textContent = hints === 2 ? 'Обе подсказки использованы' : 'Подсказка 2 / 2';
+    $('#hint').disabled = hints === 2;
+  }
+};
+
+$('#explain').onclick = () => {
+  if (attempts < 2) { say('Сначала сделай попытку ответа.'); return; }
+  say('Образец: ' + item()[1][0] + '\n' + item()[4]);
+  done = true;
+  $('#answer').disabled = true;
+  $('#send-btn').disabled = true;
+  $('#hint').disabled = true;
+  $('#explain').disabled = true;
+  
+  suggestRandomTopicWithButton();
+  
+  record(false, true);
+  $('#next').classList.remove('hide');
+  $('#next').textContent = 'Следующее задание →';
+};
+
+$('#next').onclick = () => {
+  if (test) {
+    testindex++;
+    if (testindex >= questions.length) {
+      data.tests.push({ date: new Date().toISOString(), score, total: questions.length });
+      save();
+      $('#chat').replaceChildren();
+      $('#options-box').classList.add('hide');
+
+      // Создаем маленькую кнопку «Пройти заново» в конце проверки знаний
+      const restartBtn = document.createElement('button');
+      restartBtn.className = 'chat-inline-btn';
+      restartBtn.textContent = 'Пройти заново ⟳';
+      restartBtn.onclick = () => {
+        startTest();
+      };
+
+      say(`Проверка знаний завершена! Ваш результат: ${score} из ${questions.length} верно.\n\nМожете пройти тест заново, нажав на кнопку ниже:`, false, restartBtn);
+      $('#next').classList.add('hide');
+      return;
+    }
+    start();
+  } else {
+    idx = (idx + 1) % bank[topic].length;
+    start();
+  }
+};
+
+function startTest() {
+  test = true; testindex = 0; score = 0;
+  questions = bank.flat().map(x => x).sort(() => Math.random() - .5).slice(0, 10);
+  start();
+}
+
+function newWord() {
+  const pool = data.miss.length && Math.random() < .6 ? data.miss : words.map((_, i) => i);
+  currentWord = pool[Math.floor(Math.random() * pool.length)];
+  reverse = Math.random() < .5;
+  worddone = false;
+  $('#wordanswer').value = '';
+  $('#wordanswer').disabled = false;
+  $('#wordform button').disabled = false;
+  $('#wordfeedback').textContent = '';
+  $('#word').textContent = reverse ? words[currentWord][1].split('|')[0] : words[currentWord][0];
+  $('#worddir').textContent = reverse ? 'Переведи на казахский' : 'Переведи на русский';
+  $('#wordcount').textContent = 'Повторение · ' + (data.miss.length ? 'есть слова для закрепления' : 'новое слово');
+}
+
+$('#wordform').onsubmit = e => {
+  e.preventDefault();
+  const a = $('#wordanswer').value.trim();
+  if (!a || worddone) return;
+  const accepted = words[currentWord][reverse ? 0 : 1].split('|');
+  const ok = accepted.some(x => norm(x) === norm(a));
+  if (!data.seen.includes(currentWord)) data.seen.push(currentWord);
+  if (ok) data.miss = data.miss.filter(x => x !== currentWord);
+  else if (!data.miss.includes(currentWord)) data.miss.push(currentWord);
+  $('#wordfeedback').textContent = ok ? 'Дұрыс! Верно.' : 'Правильный перевод: ' + accepted.join(' / ');
+  $('#wordfeedback').style.color = ok ? 'var(--green)' : '#c0392b';
+  worddone = true;
+  $('#wordanswer').disabled = true;
+  $('#wordform button').disabled = true;
+  save();
+};
+
+$('#wordnext').onclick = newWord;
+
+function stats() {
+  $('#s1').textContent = data.logs.filter(x => x.independent).length;
+  $('#s2').textContent = data.logs.length;
+  $('#s3').textContent = data.seen.length;
+}
+
+function renderProgress() {
+  const body = $('#rows');
+  body.replaceChildren();
+  for (const l of data.logs.slice(-30).reverse()) {
+    let tr = document.createElement('tr');
+    for (const v of [l.task, l.first, l.hints, l.correct ? (l.independent ? 'Самостоятельно' : 'После помощи') : 'Нужна проверка']) {
+      const td = document.createElement('td');
+      td.textContent = v;
+      tr.append(td);
+    }
+    body.append(tr);
+  }
+  if (!data.logs.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 4; td.textContent = 'Пока нет завершённых заданий. Начни с диалога.';
+    tr.append(td);
+    body.append(tr);
+  }
+  $('#testresult').textContent = data.tests.length ? 'Последний контроль: ' + data.tests.at(-1).score + ' / ' + data.tests.at(-1).total : 'Самопроверка ещё не завершена.';
+}
+
+$('#export').onclick = () => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'QazaqTil_results.json';
+  a.click();
+};
+
+$('#clear').onclick = () => {
+  if (confirm('Удалить все результаты на этом устройстве?')) {
+    data = { logs: [], seen: [], miss: [], tests: [] };
+    save();
+    renderProgress();
+  }
+};
+
+for (const c of 'әғқңөұүһі') {
+  const makeBtn = () => {
+    const b = document.createElement('button');
+    b.textContent = c;
+    b.type = 'button';
+    b.onclick = () => {
+      const inp = view === 'vocab' ? $('#wordanswer') : $('#answer');
+      if (!inp.disabled) {
+        const pos = inp.selectionStart ?? inp.value.length;
+        inp.setRangeText(c, pos, inp.selectionEnd ?? pos, 'end');
+        inp.focus();
+      }
+    };
+    return b;
+  };
+  $('#keyboard').append(makeBtn());
+  $('#wordkeyboard').append(makeBtn().cloneNode(true));
+  $('#wordkeyboard').lastChild.onclick = () => {
+    const inp = $('#wordanswer');
+    if (!inp.disabled) {
+      const pos = inp.selectionStart ?? inp.value.length;
+      inp.setRangeText(c, pos, inp.selectionEnd ?? pos, 'end');
+      inp.focus();
+    }
+  };
+}
+
+topics.forEach((t, i) => {
+  const b = document.createElement('button');
+  b.className = 'topic' + (!i ? ' chosen' : '');
+  const icon = document.createElement('span');
+  icon.textContent = icons[i];
+  b.append(icon, document.createTextNode(t));
+  b.onclick = () => {
+    topic = i; idx = 0;
+    document.querySelectorAll('.topic').forEach((x, j) => x.classList.toggle('chosen', j === i));
+    setView('learn');
+  };
+  $('#topics').append(b);
+});
+
+document.querySelectorAll('.nav').forEach(b => b.onclick = () => setView(b.dataset.view));
+$('#about').onclick = () => $('#modal').classList.remove('hide');
+$('#close').onclick = () => $('#modal').classList.add('hide');
+
+stats();
+start();
+</script>
+</html>
